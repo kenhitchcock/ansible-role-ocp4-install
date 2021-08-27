@@ -38,6 +38,12 @@
         name: "{{ocp4_install_baseDomain}}"
       delegate_to: localhost
 
+    - name: Print inventory hostname
+      ansible.builtin.debug:
+        var: inventory_hostname
+
+# This is the one task that relies on the dynamic inventory created by cornerstone role. 
+# If cornerstone is not used, this could try create a dns entry with a hostname.
     - name: "Create A record for Bastion server"
       azure_rm_dnsrecordset:
         resource_group: "{{ ocp4_install_baseDomain_resourcegroup }}"
@@ -45,7 +51,7 @@
         zone_name: "{{ ocp4_install_baseDomain }}"
         record_type: A
         records:
-          - entry: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+          - entry: "{{ inventory_hostname }}"
       delegate_to: localhost
 
   become: true
