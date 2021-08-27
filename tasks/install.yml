@@ -91,9 +91,10 @@
         cmd: "/usr/local/sbin/openshift-install create cluster --dir={{ ocp4_install_dir }} --log-level=info"
         chdir: /root/            
       register: ocp4_install_output
-
-    - name: "Output from OpenShift 4 installation"
-      debug: var=ocp4_install_output.stdout_lines
+    
+    - name: "Cluster Info"
+      debug: 
+         msg: "If you need to find the cluster login details, look in the .openshift_install.log log file."
 
   become: true
   when: ocp4_platform == "azure"
