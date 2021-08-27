@@ -1,0 +1,101 @@
+---
+- name: "Install & configure Azure cli."
+  block:
+    - name: "Import rpm key for Azure CLI."
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://packages.microsoft.com/keys/microsoft.asc
+
+    - name: "Add repository for Azure CLI"
+      yum_repository:
+        name: Azure CLI
+        description: "Azure CLI"
+        file: azure-cli
+        baseurl: https://packages.microsoft.com/yumrepos/azure-cli
+        gpgcheck: yes
+        gpgcakey: https://packages.microsoft.com/keys/microsoft.asc
+
+    - name: "Install Azure cli tool"
+      yum:
+        name: "azure-cli"
+        state: latest
+      when: ansible_facts['os_family'] == "RedHat" and ansible_facts['lsb']['major_release'] | int <= 7
+      ignore_errors: true
+
+    - name: "Install Azure cli tool for RHEL 8 from RPM due to Microsoft repos only having RHEL7 files"
+      yum:
+        name: "{{azure_cli_rpm}}"
+        state: present
+      when: 
+        - ansible_facts['os_family'] == "RedHat" 
+        - ansible_facts['distribution_major_version'] == "8"
+      ignore_errors: true
+
+  become: true
+  when: 
+    - ocp4_platform == "azure"
+    - azure_cli_required
+
+- name: "Install OpenShift 4 on Azure"
+  block:
+    - name: "Copy azure profile"
+      copy:
+        src: "~/.azure"
+        dest: "/root/"
+
+    - name: "Populate Azure credentials for Openshift Install"
+      template:
+        src: osServicePrincipal.j2
+        dest: "/root/.azure/osServicePrincipal.json"
+
+    - name: "Copy OpenShift Files for install"
+      copy:
+        src: "files/{{ item }}"
+        dest: "/root/{{ item }}"
+      loop: "{{ ocp4_required_files }}"
+      register: task_result
+
+    - name: "Untar OpenShift 4 install files"
+      unarchive:
+         src: "/root/{{ ocp4_install_files }}"
+         dest: /usr/local/sbin/
+         remote_src: yes
+      when: task_result is changed
+
+    - name: "Untar OpenShift 4 client files"
+      unarchive:
+         src: "/root/{{ ocp4_client_files }}"
+         dest: /usr/local/sbin/
+         remote_src: yes
+      when: task_result is changed
+
+    - name: "Check if {{ ocp4_install_files_dir }} directory exists"
+      stat: 
+        path:  "{{ ocp4_install_dir }}"
+      register: installdir
+
+    - name: "Create {{ ocp4_install_files_dir }} directory to extract files to."
+      file:
+        path: "{{ ocp4_install_dir }}"
+        state: directory
+      when: 
+        - installdir.stat.exists == false  
+
+    - name: "Populate install-config.yaml Template"
+      template:
+        src: azure-install-config.j2
+        dest: "{{ ocp4_install_dir }}/install-config.yaml"
+
+    - name: "Run OpenShift 4 installation"
+      ansible.builtin.shell:
+        cmd: "/usr/local/sbin/openshift-install create cluster --dir={{ ocp4_install_dir }} --log-level=info"
+        chdir: /root/            
+      register: ocp4_install_output
+
+    - name: "Output from OpenShift 4 installation"
+      debug: var=ocp4_install_output.stdout_lines
+
+  become: true
+  when: ocp4_platform == "azure"
+
+

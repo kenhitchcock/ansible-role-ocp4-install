@@ -1,0 +1,12 @@
+---
+
+- block:
+    - name: "Configure Bastion with Prereqs."
+      include_tasks: prereqs.yml
+      tags: [prereqs]
+
+    - name: "Install OpenShift 4."
+      include_tasks: install.yml
+      tags: [install]
+  become: true
+

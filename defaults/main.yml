@@ -1,0 +1,65 @@
+---
+# default values for role
+
+# Do you want the Azure cli on the bastion
+
+azure_cli_required: true
+azure_cli_rpm: https://packages.microsoft.com/yumrepos/azure-cli/azure-cli-2.27.2-1.el7.x86_64.rpm
+
+# First option will only be azure for now. Will need to add aws, gcp and on prem options at a later date
+ocp4_platform: azure
+
+ocp4_install_azure_subscriptionid:
+ocp4_install_azure_clientid:
+ocp4_install_azure_clientsecret:
+ocp4_install_azure_tenantid:
+
+# A list of files required by the OCP 4 install
+ocp4_required_files: 
+  - pull-secret.txt
+  - openshift-install-linux.tar.gz
+  - openshift-client-linux.tar.gz 
+
+ocp4_install_dir: "/root/ocp4-install"
+ocp4_install_files: "openshift-install-linux.tar.gz"
+ocp4_client_files: "openshift-client-linux.tar.gz"
+
+# Common install variables
+ocp4_install_baseDomain: example.com
+ocp4_install_baseDomain_resourcegroup: "PLEASE REPLACE ME"
+ocp4_install_resourcegroup: "PLEASE REPLACE ME"
+ocp4_install_location: "PLEASE REPLACE ME"
+ocp4_install_cluster_name: test-cluster
+ocp4_install_pullSecret: "PLEASE REPLACE ME"
+ocp4_install_sshKey: "PLEASE REPLACE ME"
+ocp4_install_master_replicas: 3
+ocp4_install_worker_replicas: 3
+ocp4_install_clusterNetwork_cidr: 10.128.0.0/14
+ocp4_install_clusterNetwork_hostPrefix: 23
+ocp4_install_machineNetwork_cidr: 10.0.0.0/16
+ocp4_install_machineNetwork_networkType: OpenShiftSDN
+ocp4_install_serviceNetwork_cidr: 172.30.0.0/16
+
+# Azure template default variable 
+# (it = install template)
+ocp4_install_azure_it_master_diskSizeGB: 1024
+ocp4_install_azure_it_master_instance_type: Standard_D8s_v3
+ocp4_install_azure_it_worker_instance_type: Standard_D2s_v3
+ocp4_install_azure_it_worker_diskSizeGB: 512
+
+ocp4_install_azure_it_worker_config_zones:
+  - 1
+  - 2
+  - 3
+
+install_azure_it_worker_config_az_config:
+  - name: baseDomainResourceGroupName
+    value: "PLEASE REPLACE ME"
+  - name: region
+    value: "PLEASE REPLACE ME"
+  - name: resourceGroupName
+    value: "PLEASE REPLACE ME"
+  - name: outboundType
+    value: "PLEASE REPLACE ME"
+  - name: cloudName
+    value: "PLEASE REPLACE ME"

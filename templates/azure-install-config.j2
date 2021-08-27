@@ -1,0 +1,44 @@
+apiVersion: v1
+baseDomain: {{ocp4_install_baseDomain}}
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  platform:
+    azure:
+      osDisk:
+        diskSizeGB: {{ocp4_install_azure_it_master_diskSizeGB}}
+      type: {{ocp4_install_azure_it_master_instance_type}}
+  replicas: {{ocp4_install_master_replicas}}
+compute:
+- hyperthreading: Enabled
+  name: worker
+  platform:
+    azure:
+      type: {{ocp4_install_azure_it_worker_instance_type}}
+      osDisk:
+        diskSizeGB: {{ocp4_install_azure_it_worker_diskSizeGB}}
+      zones:
+{% for item in ocp4_install_azure_it_worker_config_zones %}
+        - {{ item }}
+{% endfor %}
+  replicas: {{ocp4_install_worker_replicas}}
+metadata:
+  name: {{ocp4_install_cluster_name}}
+networking:
+  clusterNetwork:
+  - cidr: {{ocp4_install_clusterNetwork_cidr}}
+    hostPrefix: {{ocp4_install_clusterNetwork_hostPrefix}}
+  machineNetwork:
+  - cidr: {{ocp4_install_machineNetwork_cidr}}
+  networkType: {{ocp4_install_machineNetwork_networkType}}
+  serviceNetwork:
+  - {{ocp4_install_serviceNetwork_cidr}}
+platform:
+  azure:
+{% for item in install_azure_it_worker_config_az_config %}
+    {{item.name}}: {{item.value}}
+{% endfor %}
+publish: External
+pullSecret: '{{ocp4_install_pullSecret}}'
+fips: false
+sshKey: {{ocp4_install_sshKey}}

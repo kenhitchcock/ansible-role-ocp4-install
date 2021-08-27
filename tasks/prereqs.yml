@@ -1,0 +1,52 @@
+---
+- name: "Upgrade all packages"
+  block:
+    - name: "upgrade all packages"
+      yum:
+        name: '*'
+        state: latest
+      register: task_result
+
+    - name: "Reboot immediately if there was a change."
+      shell: "sleep 5 && reboot"
+      async: 1
+      poll: 0
+      when: task_result is changed
+
+    - name: "Wait for the reboot to complete if there was a change."
+      wait_for_connection:
+        connect_timeout: 20
+        sleep: 5
+        delay: 5
+        timeout: 500
+      when: task_result is changed
+
+  become: true
+
+- name: "Configure Azure with OpenShift requirements."
+  block:
+    - name: "Create a resource group for OCP Cluster, from localhost"
+      azure_rm_resourcegroup:
+        name: "{{ ocp4_install_resourcegroup }}"
+        location: "{{ ocp4_install_location }}"
+      delegate_to: localhost
+
+# The localhost must be able to create azure resources to work.
+    - name: "Create a DNS zone for OpenShift cluster, from localhost"
+      azure_rm_dnszone:
+        resource_group: "{{ocp4_install_baseDomain_resourcegroup}}"
+        name: "{{ocp4_install_baseDomain}}"
+      delegate_to: localhost
+
+    - name: "Create A record for Bastion server"
+      azure_rm_dnsrecordset:
+        resource_group: "{{ ocp4_install_baseDomain_resourcegroup }}"
+        relative_name: bastion
+        zone_name: "{{ ocp4_install_baseDomain }}"
+        record_type: A
+        records:
+          - entry: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+      delegate_to: localhost
+
+  become: true
+  when: ocp4_platform == "azure"
