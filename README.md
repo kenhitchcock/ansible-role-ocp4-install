@@ -135,7 +135,7 @@ Example Playbook
 - name: "Wait for VM to become live."
   hosts: bastion
   become: true
-  gather_facts: true
+  gather_facts: false
   vars_files:
     - ../vars/azure_basicvm.yml
 
@@ -145,6 +145,14 @@ Example Playbook
         timeout: 30
       when: vm_state == "present"
 
+- name: "Deploy OpenShift."
+  hosts: bastion
+  become: true
+  gather_facts: true
+  vars_files:
+    - ../vars/azure_basicvm.yml
+
+  tasks:
     - include_role:
         name: ../roles/ansible-role-ocp4-install
 
