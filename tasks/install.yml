@@ -50,12 +50,20 @@
         src: osServicePrincipal.j2
         dest: "/root/.azure/osServicePrincipal.json"
 
+    - name: "Download matching OpenShift version install files"
+      get_url:
+        url: "{{ ocp4_download_url }}/{{ ocp4_download_version}}/{{item}}"
+        dest: "/root/{{ item }}"
+        mode: '0740'
+      loop: "{{ ocp4_required_files }}"
+      register: task_result
+
     - name: "Copy OpenShift Files for install"
       copy:
         src: "files/{{ item }}"
         dest: "/root/{{ item }}"
-      loop: "{{ ocp4_required_files }}"
-      register: task_result
+      loop: 
+        - pull-secret.txt
 
     - name: "Untar OpenShift 4 install files"
       unarchive:

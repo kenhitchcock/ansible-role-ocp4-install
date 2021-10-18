@@ -14,9 +14,12 @@ ocp4_install_azure_clientid:
 ocp4_install_azure_clientsecret:
 ocp4_install_azure_tenantid:
 
+# Location to download install files
+ocp4_download_url: "http://mirror.openshift.com/pub/openshift-v4/clients/ocp"
+ocp4_download_version: 4.8.15
+
 # A list of files required by the OCP 4 install
 ocp4_required_files: 
-  - pull-secret.txt
   - openshift-install-linux.tar.gz
   - openshift-client-linux.tar.gz 
 
