@@ -1,0 +1,67 @@
+apiVersion: v1
+baseDomain: {{ocp4_install_baseDomain}}
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  platform:
+    gcp:
+      type: {{ocp4_install_master_instance_type}}
+      zones:
+{% for item in ocp4_install_master_config_zones %}
+        - {{ item }}
+{% endfor %}
+      osDisk:
+        diskType: {{ocp4_install_master_disktype}}
+        diskSizeGB: {{ocp4_install_master_disksize}}
+{% if ocp4_install_gcp_use_disk_encryption == "yes" %}
+        encryptionKey: 
+          kmsKey:
+            name: {{ocp4_install_kmskey_name}}
+            keyRing: {{ocp4_install_kmskeyring}}
+            location: {{ocp4_install_kmskey_location}}
+            projectID: {{ocp4_install_resourcegroup}}
+{% endif %}
+  replicas: 3
+compute:
+- hyperthreading: Enabled
+  name: worker
+  platform:
+    gcp:
+      type: {{ocp4_install_worker_instance_type}}
+      zones:
+{% for item in ocp4_install_worker_config_zones %}
+        - {{ item }}
+{% endfor %}
+      osDisk:
+        diskType: {{ocp4_install_worker_disktype}}
+        diskSizeGB: {{ocp4_install_woker_disksize}}
+{% if ocp4_install_gcp_use_disk_encryption == "yes" %}
+        encryptionKey:
+          kmsKey:
+            name: {{ocp4_install_kmskey_name}}
+            keyRing: {{ocp4_install_kmskeyring}}
+            location: {{ocp4_install_kmskey_location}}
+            projectID: {{ocp4_install_resourcegroup}}
+{% endif %}
+  replicas: {{ocp4_install_worker_replicas}}
+metadata:
+  name: {{ocp4_install_cluster_name}}
+networking:
+  clusterNetwork:
+  - cidr: {{ocp4_install_clusterNetwork_cidr}}
+    hostPrefix: {{ocp4_install_clusterNetwork_hostPrefix}}
+  machineNetwork:
+  - cidr: {{ocp4_install_machineNetwork_cidr}}
+  networkType: {{ocp4_install_machineNetwork_networkType}}
+  serviceNetwork:
+  - {{ocp4_install_serviceNetwork_cidr}}
+platform:
+  gcp:
+{% for item in ocp4_install_worker_config %}
+    {{item.name}}: {{item.value}}
+{% endfor %}
+publish: External
+pullSecret: '{{ocp4_install_pullSecret}}'
+fips: false
+sshKey: {{ocp4_install_sshKey}}
+

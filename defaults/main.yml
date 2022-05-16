@@ -1,24 +1,17 @@
 ---
 # default values for role
 
-# Do you want the Azure cli on the bastion
-
-azure_cli_required: true
-azure_cli_rpm: https://packages.microsoft.com/yumrepos/azure-cli/azure-cli-2.27.2-1.el7.x86_64.rpm
-
-# First option will only be azure for now. Will need to add aws, gcp and on prem options at a later date
+#############################################################
+# Options curent supported are azure or gcp.                #
+# aws on prem options will be added at a later date         #
+#############################################################
 ocp4_platform: azure
 
-ocp4_install_azure_subscriptionid:
-ocp4_install_azure_clientid:
-ocp4_install_azure_clientsecret:
-ocp4_install_azure_tenantid:
-
-# Location to download install files
+#############################################################
+# OpenShift install files 
+#############################################################
 ocp4_download_url: "http://mirror.openshift.com/pub/openshift-v4/clients/ocp"
-ocp4_download_version: 4.8.15
-
-# A list of files required by the OCP 4 install
+ocp4_download_version: 4.10.10
 ocp4_required_files: 
   - openshift-install-linux.tar.gz
   - openshift-client-linux.tar.gz 
@@ -27,29 +20,29 @@ ocp4_install_dir: "/root/ocp4-install"
 ocp4_install_files: "openshift-install-linux.tar.gz"
 ocp4_client_files: "openshift-client-linux.tar.gz"
 
-# Common install variables
-ocp4_install_baseDomain: example.com
+#############################################################
+# Cloud related install variables                           #
+#############################################################
 ocp4_install_baseDomain_resourcegroup: "PLEASE REPLACE ME"
 ocp4_install_resourcegroup: "PLEASE REPLACE ME"
 ocp4_install_location: "PLEASE REPLACE ME"
-ocp4_install_cluster_name: test-cluster
-ocp4_install_pullSecret: "PLEASE REPLACE ME"
-ocp4_install_sshKey: "PLEASE REPLACE ME"
-ocp4_install_master_replicas: 3
-ocp4_install_worker_replicas: 3
-ocp4_install_clusterNetwork_cidr: 10.128.0.0/14
-ocp4_install_clusterNetwork_hostPrefix: 23
-ocp4_install_machineNetwork_cidr: 10.0.0.0/16
-ocp4_install_machineNetwork_networkType: OpenShiftSDN
-ocp4_install_serviceNetwork_cidr: 172.30.0.0/16
 
-# Azure template default variable 
-# (it = install template)
+
+#############################################################
+# Azure template default variable                           #
+# (it = install template)                                   #
+#############################################################
+azure_cli_required: true
+azure_cli_rpm: https://packages.microsoft.com/yumrepos/azure-cli/azure-cli-2.27.2-1.el7.x86_64.rpm
+
+ocp4_install_azure_subscriptionid: "PLEASE REPLACE ME"
+ocp4_install_azure_clientid: "PLEASE REPLACE ME"
+ocp4_install_azure_clientsecret: "PLEASE REPLACE ME"
+ocp4_install_azure_tenantid: "PLEASE REPLACE ME"
 ocp4_install_azure_it_master_diskSizeGB: 1024
 ocp4_install_azure_it_master_instance_type: Standard_D8s_v3
 ocp4_install_azure_it_worker_instance_type: Standard_D2s_v3
 ocp4_install_azure_it_worker_diskSizeGB: 512
-
 ocp4_install_azure_it_worker_config_zones:
   - 1
   - 2
@@ -66,3 +59,61 @@ install_azure_it_worker_config_az_config:
     value: "PLEASE REPLACE ME"
   - name: cloudName
     value: "PLEASE REPLACE ME"
+
+#############################################################
+# For GCP Specific configuration                            #
+#############################################################
+gcp_gcloud_cli_download_url: https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/
+gcp_gcloud_cli_download_file: google-cloud-cli-382.0.0-linux-x86_64.tar.gz
+
+ocp4_install_worker_config:
+  - name: projectID
+    value: "PLEASE REPLACE ME"
+  - name: region
+    value: "PLEASE REPLACE ME"
+
+ocp4_install_gcp_use_disk_encryption: no
+ocp4_install_kmskey_name: worker-key
+ocp4_install_kmskeyring: test-machine-keys
+ocp4_install_kmskey_location: global
+ocp4_install_resourcegroup: "PLEASE REPLACE ME"
+
+ocp4_install_baseDomain_name: "PLEASE REPLACE ME"
+ocp4_install_baseDomain_description: "PLEASE REPLACE ME"
+
+#############################################################
+# OpenShift install default variables                       #
+#############################################################
+ocp4_install_baseDomain: example.com
+ocp4_install_cluster_name: test-cluster
+ocp4_install_pullSecret: "PLEASE REPLACE ME"
+ocp4_install_sshKey: "PLEASE REPLACE ME"
+
+# Masters
+ocp4_install_master_instance_type: "PLEASE REPLACE ME"
+ocp4_install_master_disktype: "PLEASE REPLACE ME"
+ocp4_install_master_disksize: 1024
+ocp4_install_master_replicas: 3
+ocp4_install_master_config_zones:
+ - 1
+
+# Workers
+ocp4_install_worker_instance_type:
+ocp4_install_worker_disktype:
+ocp4_install_woker_disksize:
+ocp4_install_worker_replicas: 3
+ocp4_install_worker_config_zones:
+ - 1
+
+# Network
+ocp4_install_clusterNetwork_cidr: 10.128.0.0/14
+ocp4_install_clusterNetwork_hostPrefix: 23
+ocp4_install_machineNetwork_cidr: 10.0.0.0/16
+ocp4_install_machineNetwork_networkType: OpenShiftSDN
+ocp4_install_serviceNetwork_cidr: 172.30.0.0/16
+
+
+
+
+
+

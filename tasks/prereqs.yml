@@ -56,3 +56,32 @@
 
   become: true
   when: ocp4_platform == "azure"
+
+- name: "Configure GCP with OpenShift requirements."
+  block:
+
+  - name: "create a project"
+    google.cloud.gcp_resourcemanager_project:
+      name: "{{ ocp4_install_resourcegroup }}"
+      id: "{{ ocp4_install_resourcegroup }}"
+      auth_kind: serviceaccount
+      service_account_file: "{{ ocp4_install_gcp_serviceaccount_file }}"
+      parent:
+        type: organization
+        id: "{{ ocp4_install_gcp_account_id }}"
+      state: present
+    delegate_to: localhost
+
+  - name: "create a managed zone"
+    google.cloud.gcp_dns_managed_zone:
+      name: "{{ ocp4_install_baseDomain_name }}"
+      dns_name: "{{ ocp4_install_baseDomain }}"
+      description: "Zone for {{ ocp4_install_baseDomain_description }}"
+      project: "{{ ocp4_install_resourcegroup }}"
+      auth_kind: serviceaccount
+      service_account_file: "{{ ocp4_install_gcp_serviceaccount_file }}"
+      state: present
+    delegate_to: localhost
+
+  become: true
+  when: ocp4_platform == "gcp"
